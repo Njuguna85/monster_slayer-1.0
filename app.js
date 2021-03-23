@@ -8,7 +8,8 @@ const app = Vue.createApp({
             monsterHealth: 100,
             playerHealth: 100,
             currentRound: 0,
-            winner: null
+            winner: null,
+            battleLog: [],
         }
     },
     methods: {
@@ -19,6 +20,8 @@ const app = Vue.createApp({
 
             this.currentRound++;
 
+            this.addLogMessaage('player', 'attack', attackValue)
+
             // whenever we attack the moster, the monster should attack back
             this.attackPlayer();
         },
@@ -27,12 +30,17 @@ const app = Vue.createApp({
             const attackValue = getRandomValue(8, 15);
             this.playerHealth -= attackValue;
 
+            this.addLogMessaage('monster', 'attack', attackValue)
+
+
         },
         specialAttackMonster() {
             this.currentRound++;
             // more damage but used on every three rounds
             const attackValue = getRandomValue(10, 25)
             this.monsterHealth -= attackValue;
+
+            this.addLogMessaage('player', 'special-attack', attackValue)
 
             this.attackPlayer();
         },
@@ -42,6 +50,9 @@ const app = Vue.createApp({
             if (this.playerHealth + healValue > 100) {
                 this.playerHealth = 100;
             } else { this.playerHealth += healValue; }
+            
+            this.addLogMessaage('player', 'healed', healValue)
+
             this.attackPlayer();
         },
         startNewGame() {
@@ -49,9 +60,17 @@ const app = Vue.createApp({
             this.playerHealth = 100;
             this.currentRound = 0;
             this.winner = null;
+            this.battleLog = [];
         },
         surrender() {
             this.winner = 'monster';
+        },
+        addLogMessaage(who, what, value) {
+            this.battleLog.unshift({
+                actionBy: who,
+                actionType: what,
+                actionValue: value,
+            })
         }
     },
     computed: {
